@@ -50,6 +50,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         return new PageResult(page.getTotal(),page.getResult());
     }
 
+    @Override
+    public void ChangeStatus(Employee employee) {
+        employeeMapper.update(employee);
+    }
+
     /**
      * 员工登录
      *
