@@ -9,9 +9,11 @@ import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
+import com.sky.dto.PasswordEditDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
+import com.sky.exception.PasswordEditFailedException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
 import com.sky.result.PageResult;
@@ -62,6 +64,19 @@ public class EmployeeServiceImpl implements EmployeeService {
         Employee employee=new Employee();
         BeanUtils.copyProperties(employeeDTO,employee);
         employeeMapper.update(employee);
+    }
+
+    @Override
+    public void changePassword(PasswordEditDTO passwordEditDTO) {
+        Long id=BaseContext.getCurrentId();
+        Employee employee=employeeMapper.getById(id);
+        if(employee.getPassword().equals(DigestUtils.md5DigestAsHex(passwordEditDTO.getOldPassword().getBytes()))){
+            employee.setPassword(DigestUtils.md5DigestAsHex(passwordEditDTO.getNewPassword().getBytes()));
+            employeeMapper.update(employee);
+        }else{
+            throw new PasswordEditFailedException(MessageConstant.PASSWORD_ERROR);
+        }
+
     }
 
     /**
