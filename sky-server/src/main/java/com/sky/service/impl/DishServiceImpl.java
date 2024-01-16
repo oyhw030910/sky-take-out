@@ -60,17 +60,24 @@ public class DishServiceImpl implements DishService {
     @Override
     @Transactional
     public void deleteDishBatch(List<Long> ids) {
-        for (Long id : ids) {
-            Dish dish=dishMapper.getDishById(id);
+
+        List<Dish> dishes=dishMapper.getDishByIds(ids);
+        for (Dish dish : dishes) {
             if(dish.getStatus().equals(StatusConstant.ENABLE))throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
         }
+//        for (Long id : ids) {
+//            Dish dish=dishMapper.getDishById(id);
+//            if(dish.getStatus().equals(StatusConstant.ENABLE))throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
+//        }
 
         List<Long> mealIds=mealMapper.getMealIdByDishIds(ids);
         if(mealIds!=null&&!mealIds.isEmpty())throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
 
-        for (Long id : ids) {
-            dishMapper.delete(id);
-            dishFlavorMapper.deleteByDishId(id);
-        }
+        dishMapper.deleteByIds(ids);
+        dishFlavorMapper.deleteByDishIds(ids);
+//        for (Long id : ids) {
+//            dishMapper.delete(id);
+//            dishFlavorMapper.deleteByDishId(id);
+//        }
     }
 }
