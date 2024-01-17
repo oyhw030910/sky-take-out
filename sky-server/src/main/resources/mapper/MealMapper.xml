@@ -19,6 +19,10 @@
         </set>
         where id=#{id}
     </update>
+    <delete id="deleteBatch">
+        delete from setmeal where id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")">#{id}</foreach>
+    </delete>
 
     <select id="getMealIdByDishIds" resultType="java.lang.Long">
         select id from setmeal_dish where dish_id in

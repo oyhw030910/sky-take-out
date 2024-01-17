@@ -5,6 +5,8 @@ import com.sky.dto.SetmealPageQueryDTO;
 import com.sky.result.PageResult;
 import com.sky.vo.SetmealVO;
 
+import java.util.List;
+
 public interface MealService {
     void save(SetmealDTO setmealDTO);
 
@@ -15,4 +17,6 @@ public interface MealService {
     void changeMeal(SetmealDTO setmealDTO);
 
     void changeStatus(int status, Long id);
+
+    void deleteBatch(List<Long> ids);
 }

@@ -23,4 +23,6 @@ public interface MealMapper {
 
     @AutoFill(OperationType.UPDATE)
     void update(Setmeal setmeal);
+
+    void deleteBatch(List<Long> ids);
 }

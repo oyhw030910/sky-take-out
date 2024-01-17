@@ -80,5 +80,12 @@ public class MealServiceImpl implements MealService {
         mealMapper.update(setmeal);
     }
 
+    @Override
+    @Transactional
+    public void deleteBatch(List<Long> ids) {
+        mealMapper.deleteBatch(ids);
+        mealDishMapper.deleteBatch(ids);
+    }
+
 
 }

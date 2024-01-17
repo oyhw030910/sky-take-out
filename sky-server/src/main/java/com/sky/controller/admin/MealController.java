@@ -13,6 +13,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/admin/setmeal")
 @Api("套餐相关接口")
@@ -57,6 +59,14 @@ public class MealController {
     public Result changeStatus(@PathVariable int status,Long id){
         log.info("修改套餐状态,{}",id);
         mealService.changeStatus(status,id);
+        return Result.success();
+    }
+
+    @DeleteMapping
+    @ApiOperation("批量删除套餐")
+    public Result deleteBatch(@RequestParam List<Long> ids){
+        log.info("批量删除套餐,{}",ids);
+        mealService.deleteBatch(ids);
         return Result.success();
     }
 }

@@ -12,3 +12,8 @@ sky:
     access-key-id: LTAI5t5y2k9ge4ag1jJLZHS3
     access-key-secret: TL3v0uJqnF5ZDsQ4F0ANSZR15rW1Wo
     bucket-name: sky-take-out-jianghuai
+  redis:
+    host:127.0.0.1
+    port:6379
+    password:030910
+    database:10
