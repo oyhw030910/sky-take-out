@@ -52,4 +52,11 @@ public class MealController {
         mealService.changeMeal(setmealDTO);
         return Result.success();
     }
+    @PostMapping("/status/{status}")
+    @ApiOperation("修改套餐状态")
+    public Result changeStatus(@PathVariable int status,Long id){
+        log.info("修改套餐状态,{}",id);
+        mealService.changeStatus(status,id);
+        return Result.success();
+    }
 }

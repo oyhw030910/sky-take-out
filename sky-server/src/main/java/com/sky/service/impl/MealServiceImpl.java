@@ -74,4 +74,11 @@ public class MealServiceImpl implements MealService {
     }
 
 
+    @Override
+    public void changeStatus(int status, Long id) {
+        Setmeal setmeal=Setmeal.builder().id(id).status(status).build();
+        mealMapper.update(setmeal);
+    }
+
+
 }

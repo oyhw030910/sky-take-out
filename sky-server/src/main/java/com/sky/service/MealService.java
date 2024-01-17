@@ -13,4 +13,6 @@ public interface MealService {
     SetmealVO getById(Long id);
 
     void changeMeal(SetmealDTO setmealDTO);
+
+    void changeStatus(int status, Long id);
 }
