@@ -13,7 +13,10 @@ sky:
     access-key-secret: TL3v0uJqnF5ZDsQ4F0ANSZR15rW1Wo
     bucket-name: sky-take-out-jianghuai
   redis:
-    host:127.0.0.1
-    port:6379
-    password:030910
-    database:10
+    host: 127.0.0.1
+    port: 6379
+    password: 030910
+    database: 10
+  wechat:
+    appid: wxb1f05653f4584827
+    secret: 4b6f23d3ee43c58e1ccf42cdbc5ec1e8
