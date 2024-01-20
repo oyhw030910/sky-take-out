@@ -25,4 +25,6 @@ public interface MealMapper {
     void update(Setmeal setmeal);
 
     void deleteBatch(List<Long> ids);
+
+    List<Setmeal> getByCategoryId(Long categoryId);
 }

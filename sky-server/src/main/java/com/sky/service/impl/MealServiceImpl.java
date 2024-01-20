@@ -11,6 +11,7 @@ import com.sky.mapper.MealDishMapper;
 import com.sky.mapper.MealMapper;
 import com.sky.result.PageResult;
 import com.sky.service.MealService;
+import com.sky.vo.DishItemVO;
 import com.sky.vo.SetmealVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -85,6 +86,16 @@ public class MealServiceImpl implements MealService {
     public void deleteBatch(List<Long> ids) {
         mealMapper.deleteBatch(ids);
         mealDishMapper.deleteBatch(ids);
+    }
+
+    @Override
+    public List<Setmeal> getByCategoryId(Long categoryId) {
+        return mealMapper.getByCategoryId(categoryId);
+    }
+
+    @Override
+    public List<DishItemVO> getDishViewByMealId(Long id) {
+        return mealDishMapper.getDishViewByMealId(id);
     }
 
 
