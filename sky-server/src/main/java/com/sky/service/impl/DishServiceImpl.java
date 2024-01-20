@@ -16,6 +16,7 @@ import com.sky.result.PageResult;
 import com.sky.service.DishService;
 import com.sky.vo.DishVO;
 import lombok.extern.slf4j.Slf4j;
+import lombok.var;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -104,8 +105,9 @@ public class DishServiceImpl implements DishService {
             for (DishFlavor dishFlavor : dishFlavors) {
                 dishFlavor.setDishId(dishDTO.getId());
             }
+            dishFlavorMapper.insertBatch(dishDTO.getFlavors());
         }
-        dishFlavorMapper.insertBatch(dishDTO.getFlavors());
+
     }
 
     @Override
@@ -120,18 +122,19 @@ public class DishServiceImpl implements DishService {
 
     }
 
-    @Transactional
     @Override
-    public List<DishVO> getDishVoByCategoryId(Long categoryId) {
+    @Transactional
+    public List<DishVO> list(Dish dish) {
+        List<Dish> dishes = dishMapper.list(dish);
         List<DishVO> dishVOList=new ArrayList<>();
-        List<Dish> dishes=dishMapper.getDishByCategoryId(categoryId);
-        for (Dish dish : dishes) {
+        for (Dish dish1 : dishes) {
             DishVO dishVO=new DishVO();
-            BeanUtils.copyProperties(dish,dishVO);
-            List<DishFlavor> flavors=dishFlavorMapper.getFlavorsByDishId(dish.getId());
+            BeanUtils.copyProperties(dish1,dishVO);
+            List<DishFlavor> flavors=dishFlavorMapper.getFlavorsByDishId(dish1.getId());
             dishVO.setFlavors(flavors);
             dishVOList.add(dishVO);
         }
         return dishVOList;
     }
+
 }

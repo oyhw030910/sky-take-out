@@ -11,9 +11,12 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Set;
 
 @RestController("AdminDishController")
 @RequestMapping("/admin/dish")
@@ -24,11 +27,16 @@ public class DishController {
     @Autowired
     private DishService dishService;
 
+    @Autowired
+    RedisTemplate redisTemplate;
+
     @PostMapping
     @ApiOperation("新增菜品")
+    @CacheEvict(cacheNames = "mealDish",allEntries = true)
     public Result save(@RequestBody DishDTO dishDTO){
         log.info("新增菜品,{}",dishDTO);
         dishService.saveWithFlavor(dishDTO);
+        deleteCache("dishes_"+dishDTO.getCategoryId());
         return Result.success();
     }
 
@@ -45,6 +53,7 @@ public class DishController {
     public Result deleteDishBatch(@RequestParam List<Long> ids){
         log.info("批量删除菜品,{}",ids);
         dishService.deleteDishBatch(ids);
+        deleteCache("dishes_*");
         return Result.success();
     }
 
@@ -58,9 +67,11 @@ public class DishController {
 
     @PutMapping
     @ApiOperation("修改菜品")
+    @CacheEvict(cacheNames = "mealDish",allEntries = true)
     public Result changeDish(@RequestBody DishDTO dishDTO){
         log.info("修改菜品,{}",dishDTO);
         dishService.changeDish(dishDTO);
+        deleteCache("dishes_*");
         return Result.success();
     }
 
@@ -68,6 +79,7 @@ public class DishController {
     public Result changeStatus(@PathVariable int status,Long id){
         Dish dish= Dish.builder().status(status).id(id).build();
         dishService.changeStatus(dish);
+        deleteCache("dishes_*");
         return Result.success();
     }
     @GetMapping("/list")
@@ -79,4 +91,10 @@ public class DishController {
     }
 
 
+    private void deleteCache(String pattern){
+        Set keys=redisTemplate.keys(pattern);
+        if (keys != null) {
+            redisTemplate.delete(keys);
+        }
+    }
 }

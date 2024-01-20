@@ -22,7 +22,8 @@ public interface MealService {
 
     void deleteBatch(List<Long> ids);
 
-    List<Setmeal> getByCategoryId(Long categoryId);
 
     List<DishItemVO> getDishViewByMealId(Long id);
+
+    List<Setmeal> list(Setmeal setmeal);
 }

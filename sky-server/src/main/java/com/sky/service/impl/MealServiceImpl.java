@@ -16,6 +16,7 @@ import com.sky.vo.SetmealVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +29,7 @@ public class MealServiceImpl implements MealService {
     MealMapper mealMapper;
     @Autowired
     MealDishMapper mealDishMapper;
+
 
     @Override
     @Transactional
@@ -88,14 +90,16 @@ public class MealServiceImpl implements MealService {
         mealDishMapper.deleteBatch(ids);
     }
 
-    @Override
-    public List<Setmeal> getByCategoryId(Long categoryId) {
-        return mealMapper.getByCategoryId(categoryId);
-    }
 
     @Override
     public List<DishItemVO> getDishViewByMealId(Long id) {
         return mealDishMapper.getDishViewByMealId(id);
+    }
+
+    @Override
+    public List<Setmeal> list(Setmeal setmeal) {
+
+       return mealMapper.list(setmeal);
     }
 
 

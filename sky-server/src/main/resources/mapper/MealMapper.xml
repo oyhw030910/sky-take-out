@@ -32,9 +32,9 @@
         select * from setmeal
         <where>
             <if test="name!=null">name like concat('%',#{name},'%')</if>
-            <if test="id!=null">id=#{id}</if>
-            <if test="categoryId!=null">category_id=#{categoryId}</if>
-            <if test="status!=null">status=#{status}</if>
+            <if test="id!=null">and id=#{id}</if>
+            <if test="categoryId!=null">and category_id=#{categoryId}</if>
+            <if test="status!=null">and status=#{status}</if>
         </where>
         order by create_time desc
     </select>
