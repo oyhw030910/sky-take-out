@@ -17,4 +17,8 @@ public interface OrderService {
     PageResult historyQuery(int page, int pageSize, Integer status);
 
     OrderVO orderDetail(Long id);
+
+    void cancel(Long id);
+
+    void repeat(Long id);
 }

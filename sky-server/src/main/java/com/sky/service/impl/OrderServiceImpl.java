@@ -162,4 +162,24 @@ public class OrderServiceImpl implements OrderService {
         orderVO.setOrderDetailList(orderDetailMapper.getByOrderId(id));
         return orderVO;
     }
+
+    @Override
+    public void cancel(Long id) {
+        Orders orders=Orders.builder().id(id).status(Orders.CANCELLED).build();
+        orderMapper.update(orders);
+    }
+
+    @Override
+    public void repeat(Long id) {
+        List<OrderDetail> list=orderDetailMapper.getByOrderId(id);
+        List<ShoppingCart> shoppingCartList=new ArrayList<>();
+        for (OrderDetail orderDetail : list) {
+            ShoppingCart shoppingCart=new ShoppingCart();
+            BeanUtils.copyProperties(orderDetail,shoppingCart);
+            shoppingCart.setCreateTime(LocalDateTime.now());
+            shoppingCart.setUserId(BaseContext.getCurrentId());
+            shoppingCartList.add(shoppingCart);
+        }
+        shoppingCartMapper.insertBatch(shoppingCartList);
+    }
 }
