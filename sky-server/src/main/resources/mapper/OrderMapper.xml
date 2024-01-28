@@ -50,4 +50,15 @@
         </where>
         order by order_time desc
     </select>
+    <select id="AdminPageQuery" resultType="com.sky.entity.Orders">
+        select * from orders
+        <where>
+            <if test="number!=null">and number like concat(#{number},'%')</if>
+            <if test="beginTime!=null">and begin_time &gt;=#{beginTime}</if>
+            <if test="endTime!=null">and end_time &lt;=#{endTime}</if>
+            <if test="phone!=null">and phone like concat(#{phone},'%') </if>
+            <if test="status!=null">and status=#{status}</if>
+        </where>
+        order by order_time desc
+    </select>
 </mapper>

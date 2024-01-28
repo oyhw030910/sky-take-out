@@ -70,6 +70,9 @@ public class OrderServiceImpl implements OrderService {
         orders.setConsignee(addressBook.getConsignee());
         orders.setUserId(BaseContext.getCurrentId());
 
+        String address=addressBook.getProvinceName()+addressBook.getCityName()+addressBook.getDistrictName()+addressBook.getDetail();
+        orders.setAddress(address);
+
         orderMapper.insert(orders);
 
         List<OrderDetail> list=new ArrayList<>();
@@ -181,5 +184,28 @@ public class OrderServiceImpl implements OrderService {
             shoppingCartList.add(shoppingCart);
         }
         shoppingCartMapper.insertBatch(shoppingCartList);
+    }
+
+    @Override
+    public PageResult pageQuery(OrdersPageQueryDTO ordersPageQueryDTO) {
+        PageHelper.startPage(ordersPageQueryDTO.getPage(),ordersPageQueryDTO.getPageSize());
+        Page<Orders> pages=orderMapper.AdminPageQuery(ordersPageQueryDTO);
+
+        List<OrderVO> list=new ArrayList<>();
+        for (Orders page : pages) {
+            OrderVO orderVO=new OrderVO();
+            BeanUtils.copyProperties(page,orderVO);
+            orderVO.setOrderDetailList(orderDetailMapper.getByOrderId(orderVO.getId()));
+
+            List<String> temp=new ArrayList<>();
+            for (OrderDetail orderDetail : orderVO.getOrderDetailList()) {
+                String dishes=orderDetail.getName()+'*'+orderDetail.getNumber();
+                temp.add(dishes);
+            }
+
+            orderVO.setOrderDishes(String.join(",",temp));
+            list.add(orderVO);
+        }
+        return new PageResult(pages.getTotal(),list);
     }
 }
