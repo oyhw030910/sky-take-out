@@ -18,6 +18,7 @@ import com.sky.result.PageResult;
 import com.sky.service.OrderService;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.OrderPaymentVO;
+import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
 import org.springframework.beans.BeanUtils;
@@ -207,5 +208,23 @@ public class OrderServiceImpl implements OrderService {
             list.add(orderVO);
         }
         return new PageResult(pages.getTotal(),list);
+    }
+
+    @Override
+    public OrderStatisticsVO getStatistics() {
+        List<Orders> ordersList=orderMapper.AdminPageQuery(new OrdersPageQueryDTO());
+        OrderStatisticsVO orderStatisticsVO=new OrderStatisticsVO();
+        Integer toBeConfirmed=0;
+        Integer confirmed=0;
+        Integer deliveryInProgress=0;
+        for (Orders orders : ordersList) {
+            if(orders.getStatus().equals(Orders.TO_BE_CONFIRMED))toBeConfirmed++;
+            else if(orders.getStatus().equals(Orders.CONFIRMED))confirmed++;
+            else if(orders.getStatus().equals(Orders.DELIVERY_IN_PROGRESS))deliveryInProgress++;
+        }
+        orderStatisticsVO.setToBeConfirmed(toBeConfirmed);
+        orderStatisticsVO.setConfirmed(confirmed);
+        orderStatisticsVO.setDeliveryInProgress(deliveryInProgress);
+        return orderStatisticsVO;
     }
 }

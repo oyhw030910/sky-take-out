@@ -5,6 +5,7 @@ import com.sky.dto.OrdersPageQueryDTO;
 import com.sky.result.PageResult;
 import com.sky.result.Result;
 import com.sky.service.OrderService;
+import com.sky.vo.OrderStatisticsVO;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -29,5 +30,13 @@ public class OrderController {
         log.info("查询订单,{}",ordersPageQueryDTO);
         PageResult pageResult=orderService.pageQuery(ordersPageQueryDTO);
         return Result.success(pageResult);
+    }
+
+    @GetMapping("/statistics")
+    @ApiOperation("统计订单数据")
+    public Result<OrderStatisticsVO> getStatistics(){
+        log.info("查询订单数据");
+        OrderStatisticsVO orderStatisticsVO=orderService.getStatistics();
+        return Result.success(orderStatisticsVO);
     }
 }
