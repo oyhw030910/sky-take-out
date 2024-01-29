@@ -56,5 +56,3 @@ sky:
     appid: ${sky.wechat.appid}
     secret: ${sky.wechat.secret}
 
-  shop:
-    address: ${sky.shop.address}

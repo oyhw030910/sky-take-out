@@ -1,5 +1,6 @@
 package com.sky.service.impl;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -13,6 +14,7 @@ import com.sky.exception.ShoppingCartBusinessException;
 import com.sky.mapper.*;
 import com.sky.result.PageResult;
 import com.sky.service.OrderService;
+import com.sky.utils.HttpClientUtil;
 import com.sky.utils.WeChatPayUtil;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
@@ -21,13 +23,16 @@ import com.sky.vo.OrderVO;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -46,6 +51,12 @@ public class OrderServiceImpl implements OrderService {
     @Autowired
     private WeChatPayUtil weChatPayUtil;
 
+    @Value("${sky.shop.address}")
+    private String shopAddress;
+
+    @Value("${sky.gaode.key}")
+    private String key;
+
 
     @Override
     @Transactional
@@ -54,6 +65,7 @@ public class OrderServiceImpl implements OrderService {
         if(addressBook==null){
             throw new AddressBookBusinessException(MessageConstant.ADDRESS_BOOK_IS_NULL);
         }
+        isReachable(addressBook.getCityName()+addressBook.getDistrictName()+addressBook.getDetail());
 
         ShoppingCart shoppingCart=ShoppingCart.builder().id(BaseContext.getCurrentId()).build();
         List<ShoppingCart> shoppingCartList=shoppingCartMapper.list(shoppingCart);
@@ -278,5 +290,53 @@ public class OrderServiceImpl implements OrderService {
         orders.setStatus(Orders.COMPLETED);
         orders.setDeliveryTime(LocalDateTime.now());
         orderMapper.update(orders);
+    }
+
+    private void isReachable(String address){
+        log.info(shopAddress);
+        log.info(key);
+
+        Map map=new HashMap<>();
+        map.put("address",shopAddress);
+        map.put("output","json");
+        map.put("key",key);
+        String shopCoordinate= HttpClientUtil.doGet("https://restapi.amap.com/v3/geocode/geo?",map);
+
+        JSONObject jsonObject=JSONObject.parseObject(shopCoordinate);
+        if(jsonObject==null||jsonObject.getString("status").equals("0")){
+            log.info("失败原因,{}",jsonObject.getString("info"));
+            throw new OrderBusinessException("店铺地址解析失败");
+        }
+        shopCoordinate=jsonObject.getJSONArray("geocodes").getJSONObject(0).getString("location");
+
+        map=new HashMap<>();
+        map.put("address",address);
+        map.put("output","json");
+        map.put("key",key);
+        String userCoordinate= HttpClientUtil.doGet("https://restapi.amap.com/v3/geocode/geo?",map);
+
+        jsonObject=JSONObject.parseObject(userCoordinate);
+        if(jsonObject==null||jsonObject.getString("status").equals("0")){
+            throw new OrderBusinessException("收货地址解析失败");
+        }
+        userCoordinate=jsonObject.getJSONArray("geocodes").getJSONObject(0).getString("location");
+
+        map.put("origins",shopCoordinate);
+        map.put("destination",userCoordinate);
+        map.put("type","1");
+        map.put("output","json");
+        map.put("key",key);
+        String distance=HttpClientUtil.doGet("https://restapi.amap.com/v3/distance?",map);
+        jsonObject=JSONObject.parseObject(distance);
+        if(jsonObject==null||jsonObject.getString("status").equals("0")){
+            throw new OrderBusinessException("获取距离失败");
+        }
+        log.info("{}",jsonObject);
+        JSONArray results=(JSONArray) jsonObject.get("results");
+        int length=Integer.valueOf((String) results.getJSONObject(0).get("distance"));
+
+        if(length>5000){
+            throw new OrderBusinessException("超出配送范围");
+        }
     }
 }

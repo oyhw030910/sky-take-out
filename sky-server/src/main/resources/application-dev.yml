@@ -22,3 +22,5 @@ sky:
     secret: 4b6f23d3ee43c58e1ccf42cdbc5ec1e8
   shop:
     address: 北京市海淀区西土城路10号
+  gaode:
+    key: b2db8336db38c884de64b7e50c487a01
