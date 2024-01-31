@@ -20,6 +20,8 @@ import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
 import com.sky.vo.OrderVO;
+import com.sky.webSocket.WebSocketServer;
+import javassist.tools.web.Webserver;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -50,6 +52,8 @@ public class OrderServiceImpl implements OrderService {
     private UserMapper userMapper;
     @Autowired
     private WeChatPayUtil weChatPayUtil;
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     @Value("${sky.shop.address}")
     private String shopAddress;
@@ -146,6 +150,13 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderMapper.update(orders);
+
+        Map map=new HashMap<>();
+        map.put("type",1);
+        map.put("orderId",ordersDB.getId());
+        map.put("content","订单号："+outTradeNo);
+        String json=JSONObject.toJSONString(map);
+        webSocketServer.sendToAllClient(json);
     }
 
     @Override
@@ -290,6 +301,19 @@ public class OrderServiceImpl implements OrderService {
         orders.setStatus(Orders.COMPLETED);
         orders.setDeliveryTime(LocalDateTime.now());
         orderMapper.update(orders);
+    }
+
+    @Override
+    public void remind(Long id) {
+        Orders orders=orderMapper.getById(id);
+        if(orders==null)throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        Map map=new HashMap<>();
+        map.put("type",2);
+        map.put("orderId",id);
+        map.put("content","订单号："+orders.getNumber());
+
+        String json=JSONObject.toJSONString(map);
+        webSocketServer.sendToAllClient(json);
     }
 
     private void isReachable(String address){
