@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
+import java.util.Map;
 
 @Mapper
 public interface MealMapper {
@@ -27,4 +28,6 @@ public interface MealMapper {
     void deleteBatch(List<Long> ids);
 
     List<Setmeal> getByCategoryId(Long categoryId);
+
+    Integer countByMap(Map map);
 }
